@@ -10,15 +10,47 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    //model
+    //view
     @IBOutlet weak var faceView: FaceView! {
         didSet {
             //update when model is set (will be called only once)
+            let handler = #selector(FaceView.changeScale(byReactingTo:))
+            let pinchRecognizer = UIPinchGestureRecognizer(target: faceView, action: handler)
+            faceView.addGestureRecognizer(pinchRecognizer)
+            let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(toggleEyes(byReactingTo:)))
+            faceView.addGestureRecognizer(tapRecognizer)
+            let swipeUpRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(increaseHappiness))
+            swipeUpRecognizer.direction = .up
+            faceView.addGestureRecognizer(swipeUpRecognizer)
+            let swipeDownRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(decreaseHappiness))
+            swipeDownRecognizer.direction = .down
+            faceView.addGestureRecognizer(swipeDownRecognizer)
             updateUI()
         }
     }
     
-    //view
+   @objc func toggleEyes(byReactingTo tapRecognizer: UITapGestureRecognizer) {
+        if tapRecognizer.state == .ended {
+            var eyes: FacialExpression.Eyes = expression.eyes
+            switch eyes {
+            case .closed:
+                eyes = .open
+            default:
+                eyes = .closed
+            }
+            expression.eyes = eyes
+        }
+    }
+    
+    @objc func increaseHappiness() {
+        expression = expression.happier
+    }
+    
+    @objc func decreaseHappiness() {
+        expression = expression.sadder
+    }
+    
+    //model
     var expression = FacialExpression(eyes: .open, mouth: .grin) {
         didSet {
             //update every time view changes
@@ -26,9 +58,9 @@ class ViewController: UIViewController {
         }
     }
     
-    //update model when view changes
+    //update view when model changes
     private func updateUI() {
-        //one way to set model
+        //one way to set view
         switch expression.eyes {
         case .open:
             faceView?.eyesOpen = true

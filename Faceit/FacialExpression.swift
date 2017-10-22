@@ -37,6 +37,6 @@ struct FacialExpression {
         return FacialExpression(eyes: self.eyes, mouth: self.mouth.happier)
     }
     
-    let eyes: Eyes
+    var eyes: Eyes
     let mouth: Mouth
 }
